@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>🧺 세탁실 현황판</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#f5f4f0;
+  --s1:#ffffff;
+  --s2:#f0efe9;
+  --s3:#e8e7e0;
+  --border:#e0dfd8;
+  --border2:#d4d3cb;
+  --border3:#c8c7be;
+  --text:#1a1916;
+  --text2:#6b6a62;
+  --text3:#9b9a92;
+  --green:#1a8f56;
+  --green-bg:#eaf6f0;
+  --green-border:#b3dfc8;
+  --amber:#c47d00;
+  --amber-bg:#fff8e6;
+  --amber-border:#f0c96a;
+  --blue:#1a6faf;
+  --blue-bg:#e8f2fb;
+  --blue-border:#9ecbef;
+  --red:#c43030;
+  --red-bg:#fdf0f0;
+  --red-border:#f0b3b3;
+  --purple:#6b41c4;
+  --purple-bg:#f3effe;
+  --purple-border:#c4a8f0;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'Noto Sans KR',sans-serif;
+  --display:'Bebas Neue',sans-serif;
+  --r:16px;--r-sm:10px;--r-xs:7px;
+}
+html,body{background:var(--bg);}
+body{
+  font-family:var(--sans);color:var(--text);
+  min-height:100vh;max-width:480px;margin:0 auto;
+  padding-bottom:50px;
+}
+
+/* HEADER */
+.header{
+  padding:16px 16px 12px;
+  background:var(--s1);border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.hbrand{display:flex;align-items:center;gap:10px;}
+.hicon{
+  width:38px;height:38px;border-radius:10px;
+  background:var(--s2);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;font-size:20px;
+}
+.htitle{font-family:var(--display);font-size:20px;letter-spacing:0.04em;line-height:1;}
+.hsub{font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:2px;letter-spacing:0.06em;}
+.live-pill{
+  display:flex;align-items:center;gap:5px;
+  font-family:var(--mono);font-size:9px;letter-spacing:0.06em;
+  color:var(--green);background:var(--green-bg);
+  border:1px solid var(--green-border);padding:4px 10px;border-radius:99px;
+}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 1.5s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:14px 14px 0;}
+.scard{background:var(--s1);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 10px;text-align:center;}
+.snum{font-family:var(--display);font-size:28px;line-height:1;letter-spacing:0.02em;}
+.slbl{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:0.07em;margin-top:3px;}
+
+/* SECTION */
+.section{padding:16px 14px 0;}
+.sec-hd{
+  font-family:var(--mono);font-size:9px;color:var(--text3);
+  letter-spacing:0.13em;text-transform:uppercase;
+  display:flex;align-items:center;gap:8px;margin-bottom:10px;
+}
+.sec-hd::after{content:'';flex:1;height:1px;background:var(--border);}
+.mgrid{display:flex;flex-direction:column;gap:10px;}
+
+/* MACHINE CARD */
+.mcard{
+  background:var(--s1);border:1.5px solid var(--border);
+  border-radius:var(--r);overflow:hidden;transition:border-color .2s;
+}
+.mcard.state-busy{border-color:var(--amber-border);}
+.mcard.state-busy.type-dryer{border-color:var(--blue-border);}
+.mcard.state-free{border-color:var(--green-border);}
+
+/* CARD TOP */
+.ctop{display:flex;align-items:flex-start;gap:12px;padding:14px 14px 0;}
+
+/* MACHINE VIS */
+.mvis{flex-shrink:0;width:58px;height:58px;position:relative;}
+.mbody{
+  width:58px;height:58px;border-radius:11px;
+  background:var(--s2);border:1.5px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;
+}
+.mbody::before{
+  content:'';position:absolute;top:5px;left:5px;right:5px;height:5px;
+  border-radius:3px;background:var(--border2);
+}
+.mbody::after{
+  content:'';position:absolute;bottom:6px;left:6px;
+  width:6px;height:6px;border-radius:50%;background:var(--border3);
+}
+.drum{
+  width:36px;height:36px;border-radius:50%;border:2px solid;
+  position:relative;display:flex;align-items:center;justify-content:center;
+}
+.drum.w-drum{border-color:var(--amber-border);background:radial-gradient(circle at 38% 38%,#fff8e0,#fef0c0);}
+.drum.d-drum{border-color:var(--blue-border);background:radial-gradient(circle at 38% 38%,#e0f0ff,#c8e4ff);}
+.drum.f-drum{border-color:var(--green-border);background:radial-gradient(circle at 38% 38%,#e8f7f0,#d0eee0);}
+.drum::before{content:'';position:absolute;width:11px;height:11px;border-radius:50%;border:1.5px solid;opacity:0.6;}
+.drum.w-drum::before{border-color:var(--amber);}
+.drum.d-drum::before{border-color:var(--blue);}
+.drum.f-drum::before{border-color:var(--green);opacity:0.35;}
+.drum.spinning{animation:dspin 1.8s linear infinite;}
+@keyframes dspin{to{transform:rotate(360deg);}}
+.ripple{
+  position:absolute;inset:0;border-radius:50%;
+  background:conic-gradient(from 0deg,rgba(196,125,0,0.20) 0%,transparent 35%,rgba(196,125,0,0.10) 65%,transparent 100%);
+  animation:rr 2.4s linear infinite;display:none;
+}
+.w-drum .ripple{display:block;}
+@keyframes rr{to{transform:rotate(-360deg);}}
+
+.lock-badge{
+  position:absolute;top:-5px;right:-5px;
+  width:20px;height:20px;border-radius:50%;
+  background:var(--amber);border:2px solid var(--s1);
+  display:none;align-items:center;justify-content:center;
+  font-size:9px;z-index:2;
+}
+.lock-badge.dlock{background:var(--blue);}
+.mcard.state-busy .lock-badge{display:flex;}
+
+/* INFO */
+.cinfo{flex:1;min-width:0;}
+.cnrow{display:flex;align-items:center;justify-content:space-between;gap:6px;}
+.cname{font-family:var(--display);font-size:20px;letter-spacing:0.05em;line-height:1;}
+.spill{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.07em;padding:3px 8px;border-radius:99px;border:1px solid;white-space:nowrap;}
+.spill-busy{color:var(--amber);background:var(--amber-bg);border-color:var(--amber-border);}
+.spill-free{color:var(--green);background:var(--green-bg);border-color:var(--green-border);}
+.spill-dbusy{color:var(--blue);background:var(--blue-bg);border-color:var(--blue-border);}
+.urow{display:flex;align-items:center;gap:7px;margin-top:8px;}
+.rchip{font-family:var(--mono);font-size:13px;font-weight:700;background:var(--s2);border:1px solid var(--border2);padding:3px 9px;border-radius:var(--r-xs);letter-spacing:0.04em;}
+.uname{font-size:12px;color:var(--text2);}
+.tstrip{display:flex;align-items:center;justify-content:space-between;margin-top:10px;}
+.fblock{display:flex;flex-direction:column;gap:1px;}
+.flbl{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:0.07em;}
+.fval{font-family:var(--mono);font-size:24px;font-weight:700;letter-spacing:-0.02em;line-height:1;}
+.fval.ac{color:var(--amber);}
+.fval.bc{color:var(--blue);}
+.rblock{text-align:right;}
+.rlbl{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:0.06em;}
+.rval{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text2);}
+.avail-msg{font-size:12px;color:var(--green);margin-top:6px;font-weight:500;}
+
+/* PROGRESS */
+.ptrack{height:4px;background:var(--s3);border-radius:99px;overflow:hidden;margin:10px 14px 0;}
+.pfill{height:100%;border-radius:99px;background:var(--amber);transition:width 1s linear;}
+.pfill.bf{background:var(--blue);}
+
+/* QUEUE */
+.qsec{margin:10px 14px 0;padding:9px 10px;background:var(--s2);border:1px solid var(--border);border-radius:var(--r-xs);}
+.qhd{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:0.08em;margin-bottom:5px;}
+.qlist{display:flex;flex-direction:column;gap:4px;}
+.qitem{display:flex;align-items:center;justify-content:space-between;}
+.qleft{display:flex;align-items:center;gap:6px;}
+.qn{font-family:var(--mono);font-size:9px;color:var(--text3);min-width:12px;}
+.qr{font-family:var(--mono);font-size:11px;font-weight:700;background:var(--s3);padding:1px 6px;border-radius:4px;}
+.qname{font-size:11px;color:var(--text2);}
+.qrm{font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer;padding:2px 5px;border-radius:4px;transition:color .15s,background .15s;}
+.qrm:hover{color:var(--red);background:var(--red-bg);}
+.qempty{font-size:11px;color:var(--text3);font-family:var(--mono);}
+
+/* CARD ACTIONS */
+.cactions{padding:10px 14px 14px;}
+.btn{font-family:var(--sans);font-size:12px;font-weight:700;padding:9px 14px;border-radius:var(--r-xs);border:1.5px solid;cursor:pointer;transition:opacity .15s,transform .1s;letter-spacing:0.02em;}
+.btn:active{transform:scale(0.96);}
+.btn-primary{flex:1;background:var(--green);border-color:var(--green);color:#fff;}
+.btn-primary.db{background:var(--blue);border-color:var(--blue);}
+.btn-primary:hover{opacity:0.85;}
+.btn-ghost{background:transparent;border-color:var(--border2);color:var(--text2);}
+.btn-ghost:hover{background:var(--s2);}
+.btn-queue{width:100%;background:var(--purple-bg);border-color:var(--purple-border);color:var(--purple);}
+.btn-queue:hover{opacity:0.85;}
+.btn-finish{width:100%;background:var(--s2);border-color:var(--border2);color:var(--text2);}
+.btn-finish:hover{background:var(--s3);}
+
+/* ── TIME PICKER ── */
+.time-picker{
+  background:var(--s2);border:1px solid var(--border);
+  border-radius:var(--r-sm);padding:14px;margin-bottom:10px;
+}
+.tp-display{
+  text-align:center;
+  font-family:var(--mono);font-size:42px;font-weight:700;
+  letter-spacing:0.04em;color:var(--text);
+  margin-bottom:16px;line-height:1;
+}
+.tp-sep{color:var(--border3);}
+.tp-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.tp-lbl{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:0.1em;text-align:center;margin-bottom:8px;}
+/* range slider */
+input[type=range].tp-slider{
+  -webkit-appearance:none;appearance:none;
+  width:100%;height:8px;
+  border-radius:99px;outline:none;cursor:pointer;
+  background:var(--border2);
+}
+input[type=range].tp-slider.amber-sl{background:linear-gradient(90deg,var(--amber-border) 0%,var(--border2) 0%);}
+input[type=range].tp-slider.blue-sl{background:linear-gradient(90deg,var(--blue-border) 0%,var(--border2) 0%);}
+input[type=range].tp-slider::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;
+  width:24px;height:24px;border-radius:50%;
+  border:3px solid var(--s1);
+  box-shadow:0 1px 5px rgba(0,0,0,0.22);cursor:pointer;
+}
+input[type=range].tp-slider.amber-sl::-webkit-slider-thumb{background:var(--amber);}
+input[type=range].tp-slider.blue-sl::-webkit-slider-thumb{background:var(--blue);}
+input[type=range].tp-slider::-moz-range-thumb{
+  width:22px;height:22px;border-radius:50%;border:3px solid var(--s1);
+  box-shadow:0 1px 5px rgba(0,0,0,0.22);cursor:pointer;
+}
+input[type=range].tp-slider.amber-sl::-moz-range-thumb{background:var(--amber);}
+input[type=range].tp-slider.blue-sl::-moz-range-thumb{background:var(--blue);}
+
+.tp-ticks{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:5px;padding:0 2px;}
+.tp-presets{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
+.tp-pre-lbl{font-family:var(--mono);font-size:9px;color:var(--text3);align-self:center;letter-spacing:0.06em;}
+.tp-pre{
+  font-family:var(--mono);font-size:10px;padding:5px 11px;border-radius:99px;
+  border:1px solid var(--border2);background:var(--s1);
+  color:var(--text2);cursor:pointer;transition:background .15s,border-color .15s,color .15s;
+}
+.tp-pre:hover{background:var(--s3);border-color:var(--border3);color:var(--text);}
+.tp-pre.active{background:var(--text);border-color:var(--text);color:var(--s1);}
+
+/* MODAL */
+.modal-ov{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,0.3);z-index:500;
+  align-items:flex-end;justify-content:center;
+}
+.modal-ov.open{display:flex;}
+.modal{
+  background:var(--s1);border:1px solid var(--border2);
+  border-radius:var(--r) var(--r) 0 0;
+  padding:20px;width:100%;max-width:480px;
+  animation:sup .2s ease;max-height:92vh;overflow-y:auto;
+}
+@keyframes sup{from{transform:translateY(30px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.mtitle{font-family:var(--display);font-size:20px;letter-spacing:0.05em;margin-bottom:3px;}
+.msub{font-size:12px;color:var(--text3);font-family:var(--mono);margin-bottom:14px;letter-spacing:0.04em;}
+.mrow{display:flex;gap:8px;align-items:center;margin-bottom:8px;}
+.mlbl{font-family:var(--mono);font-size:10px;color:var(--text3);min-width:48px;letter-spacing:0.04em;}
+.mctrl{
+  flex:1;background:var(--s2);border:1px solid var(--border2);
+  color:var(--text);font-family:var(--sans);font-size:13px;
+  padding:8px 10px;border-radius:var(--r-xs);outline:none;
+  transition:border-color .15s;width:100%;
+}
+.mctrl:focus{border-color:var(--green);}
+.mctrl option{background:var(--s1);}
+.mbtns{display:flex;gap:8px;margin-top:8px;}
+
+/* NOTIFY BAR */
+.nbar{
+  margin:14px 14px 0;
+  background:var(--blue-bg);border:1px solid var(--blue-border);
+  border-radius:var(--r-sm);padding:10px 14px;
+  display:flex;align-items:center;gap:10px;cursor:pointer;
+}
+.nbar p{font-size:12px;color:var(--blue);flex:1;}
+.nbar button{
+  font-size:11px;font-family:var(--mono);font-weight:700;
+  background:var(--blue);color:#fff;border:none;
+  padding:5px 12px;border-radius:99px;cursor:pointer;white-space:nowrap;
+}
+
+/* TOAST */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  background:var(--text);color:var(--s1);
+  font-size:13px;font-family:var(--sans);
+  padding:10px 20px;border-radius:99px;
+  opacity:0;pointer-events:none;transition:opacity .25s;
+  z-index:999;white-space:nowrap;
+}
+.toast.show{opacity:1;}
+
+/* HISTORY */
+.hitem{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);}
+.hitem:last-child{border-bottom:none;}
+.hleft{display:flex;align-items:center;gap:9px;}
+.hico{width:28px;height:28px;border-radius:7px;background:var(--s2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:13px;}
+.hname{font-size:12px;color:var(--text2);}
+.hroom{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:1px;}
+.htime{font-family:var(--mono);font-size:10px;color:var(--text3);}
+.hempty{font-family:var(--mono);font-size:11px;color:var(--text3);text-align:center;padding:16px 0;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="hbrand">
+    <div class="hicon">🧺</div>
+    <div>
+      <div class="htitle">LAUNDRY ROOM</div>
+      <div class="hsub">건조기 2 · 세탁기 3</div>
+    </div>
+  </div>
+  <div class="live-pill"><div class="live-dot"></div>LIVE</div>
+</div>
+
+<div class="stats-row" id="stats-row"></div>
+<div id="nbar-wrap"></div>
+
+<div class="section">
+  <div class="sec-hd">건조기</div>
+  <div class="mgrid" id="dryer-grid"></div>
+</div>
+
+<div class="section">
+  <div class="sec-hd">세탁기</div>
+  <div class="mgrid" id="washer-grid"></div>
+</div>
+
+<div class="section">
+  <div class="sec-hd">최근 사용 기록</div>
+  <div id="history-grid"></div>
+</div>
+
+<!-- START MODAL -->
+<div class="modal-ov" id="start-modal" onclick="closeSM(event)">
+  <div class="modal">
+    <div class="mtitle" id="sm-title">세탁기 시작</div>
+    <div class="msub">사용 정보를 입력하세요</div>
+    <div class="mrow">
+      <div class="mlbl">호실</div>
+      <select class="mctrl" id="sm-room"><option value="">선택</option></select>
+    </div>
+    <div class="mrow">
+      <div class="mlbl">이름</div>
+      <input class="mctrl" id="sm-name" type="text" placeholder="선택사항 (예: 홍길동)">
+    </div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:0.07em;margin-bottom:8px;">종료 시간</div>
+    <div class="time-picker">
+      <div class="tp-display"><span id="tp-h">00</span><span class="tp-sep">:</span><span id="tp-m">00</span></div>
+      <div class="tp-cols">
+        <div>
+          <div class="tp-lbl">시 (0 – 23)</div>
+          <input type="range" class="tp-slider amber-sl" id="sl-h" min="0" max="23" value="0" step="1" oninput="updateTP()">
+          <div class="tp-ticks"><span>0</span><span>6</span><span>12</span><span>18</span><span>23</span></div>
+        </div>
+        <div>
+          <div class="tp-lbl">분 (10분 단위)</div>
+          <input type="range" class="tp-slider amber-sl" id="sl-m" min="0" max="5" value="0" step="1" oninput="updateTP()">
+          <div class="tp-ticks"><span>0</span><span>10</span><span>20</span><span>30</span><span>40</span><span>50</span></div>
+        </div>
+      </div>
+      <div class="tp-presets" id="tp-presets">
+        <span class="tp-pre-lbl">빠른 선택</span>
+      </div>
+    </div>
+    <div class="mbtns">
+      <button class="btn btn-ghost" onclick="closeSMdirect()">취소</button>
+      <button class="btn btn-primary" id="sm-confirm" onclick="confirmStart()">시작</button>
+    </div>
+  </div>
+</div>
+
+<!-- QUEUE MODAL -->
+<div class="modal-ov" id="queue-modal" onclick="closeQM(event)">
+  <div class="modal">
+    <div class="mtitle" id="qm-title">대기 신청</div>
+    <div class="msub">다음 사용 대기를 신청합니다</div>
+    <div class="mrow">
+      <div class="mlbl">호실</div>
+      <select class="mctrl" id="qm-room"><option value="">선택</option></select>
+    </div>
+    <div class="mrow">
+      <div class="mlbl">이름</div>
+      <input class="mctrl" id="qm-name" type="text" placeholder="선택사항">
+    </div>
+    <div class="mbtns">
+      <button class="btn btn-ghost" onclick="closeQMdirect()">취소</button>
+      <button class="btn btn-primary" style="background:var(--purple);border-color:var(--purple);" onclick="confirmQueue()">대기 신청</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const ROOMS=['301','302','303','304A','304B','401','402','403','404A','404B','501','502','503','504','505'];
+const MACHINES=[
+  {id:'d1',label:'건조기1',type:'dryer',emoji:'💨'},
+  {id:'d2',label:'건조기2',type:'dryer',emoji:'💨'},
+  {id:'w1',label:'세탁기3',type:'washer',emoji:'🌊'},
+  {id:'w2',label:'세탁기4',type:'washer',emoji:'🌊'},
+  {id:'w3',label:'세탁기5',type:'washer',emoji:'🌊'},
+];
+
+let state={}, queues={}, history=[];
+let pendingId=null;
+let notifyGranted=false;
+let notifyTimers={};
+
+function loadState(){
+  try{
+    const s=localStorage.getItem('lh_v6_state');
+    const q=localStorage.getItem('lh_v6_queues');
+    const h=localStorage.getItem('lh_v6_history');
+    if(s) state=JSON.parse(s);
+    if(q) queues=JSON.parse(q);
+    if(h) history=JSON.parse(h);
+  }catch(e){}
+  MACHINES.forEach(m=>{
+    if(!state[m.id]) state[m.id]=null;
+    if(!queues[m.id]) queues[m.id]=[];
+  });
+  notifyGranted=('Notification' in window && Notification.permission==='granted');
+}
+function saveState(){
+  try{
+    localStorage.setItem('lh_v6_state',JSON.stringify(state));
+    localStorage.setItem('lh_v6_queues',JSON.stringify(queues));
+    localStorage.setItem('lh_v6_history',JSON.stringify(history));
+  }catch(e){}
+}
+
+function pad(n){return String(n).padStart(2,'0');}
+function fmtNow(){const d=new Date();return `${pad(d.getHours())}:${pad(d.getMinutes())}`;}
+
+function timeToEndMs(hhmm){
+  if(!hhmm) return 0;
+  const [h,m]=hhmm.split(':').map(Number);
+  const now=new Date();
+  const t=new Date(now.getFullYear(),now.getMonth(),now.getDate(),h,m,0,0);
+  if(t<=now) t.setDate(t.getDate()+1);
+  return t.getTime();
+}
+function remainingMs(endTimeStr){return Math.max(0,timeToEndMs(endTimeStr)-Date.now());}
+function fmtRem(ms){
+  if(ms<=0) return '완료';
+  const s=Math.floor(ms/1000);
+  const m=Math.floor(s/60),sec=s%60;
+  if(m>=60){const h2=Math.floor(m/60);return `${h2}h ${pad(m%60)}m`;}
+  return `${pad(m)}:${pad(sec)}`;
+}
+function progressPct(startTs,endTimeStr){
+  const end=timeToEndMs(endTimeStr);
+  const total=end-startTs;
+  if(total<=0) return 100;
+  return Math.min(100,Math.round((Date.now()-startTs)/total*100));
+}
+
+/* ── NOTIFICATION TIMERS ── */
+function scheduleNotify(machineId){
+  const s=state[machineId];
+  if(!s||!notifyGranted) return;
+  clearTimeout(notifyTimers[machineId]);
+  const rem=remainingMs(s.endTime);
+  if(rem<=0) return;
+  notifyTimers[machineId]=setTimeout(()=>{
+    if(!state[machineId]) return;
+    const m=MACHINES.find(x=>x.id===machineId);
+    const si=state[machineId];
+    try{
+      new Notification(`⏰ ${m.label} 완료!`,{
+        body:`${si.room}호${si.name?' '+si.name:''} — 세탁/건조가 끝났습니다 🧺`,
+        tag:machineId,
+      });
+    }catch(e){}
+    finishMachine(machineId,true);
+  },rem);
+}
+function scheduleAllNotify(){MACHINES.forEach(m=>{if(state[m.id]) scheduleNotify(m.id);});}
+function clearNotifyTimer(id){clearTimeout(notifyTimers[id]);delete notifyTimers[id];}
+
+function requestNotify(){
+  if(!('Notification' in window)){showToast('이 브라우저는 알림을 지원하지 않아요');return;}
+  Notification.requestPermission().then(p=>{
+    notifyGranted=(p==='granted');
+    renderNBar();
+    if(notifyGranted){scheduleAllNotify();showToast('🔔 알림이 활성화되었습니다');}
+  });
+}
+
+/* ── TIME PICKER ── */
+function updateTP(){
+  const h=parseInt(document.getElementById('sl-h').value);
+  const mIdx=parseInt(document.getElementById('sl-m').value);
+  document.getElementById('tp-h').textContent=pad(h);
+  document.getElementById('tp-m').textContent=pad(mIdx*10);
+  // update slider fill
+  const slH=document.getElementById('sl-h');
+  const slM=document.getElementById('sl-m');
+  const pctH=Math.round(h/23*100);
+  const pctM=Math.round(mIdx/5*100);
+  const isA=slH.classList.contains('amber-sl');
+  const col=isA?'var(--amber-border)':'var(--blue-border)';
+  slH.style.background=`linear-gradient(90deg,${col} ${pctH}%,var(--border2) ${pctH}%)`;
+  slM.style.background=`linear-gradient(90deg,${col} ${pctM}%,var(--border2) ${pctM}%)`;
+  document.querySelectorAll('.tp-pre').forEach(btn=>{
+    btn.classList.toggle('active',btn.dataset.h==h&&btn.dataset.mi==mIdx);
+  });
+}
+function setTimePicker(h,mIdx){
+  document.getElementById('sl-h').value=h;
+  document.getElementById('sl-m').value=mIdx;
+  updateTP();
+}
+function buildPresets(isW){
+  const wrap=document.getElementById('tp-presets');
+  wrap.innerHTML='<span class="tp-pre-lbl">빠른 선택</span>';
+  [30,45,60,90,120].forEach(mins=>{
+    const t=new Date(Date.now()+mins*60000);
+    const h=t.getHours();
+    const mIdx=Math.round(t.getMinutes()/10)%6;
+    const btn=document.createElement('button');
+    btn.className='tp-pre';btn.textContent=`+${mins}분`;
+    btn.dataset.h=h;btn.dataset.mi=mIdx;
+    btn.onclick=()=>setTimePicker(h,mIdx);
+    wrap.appendChild(btn);
+  });
+}
+function getSelectedTime(){
+  const h=parseInt(document.getElementById('sl-h').value);
+  const mIdx=parseInt(document.getElementById('sl-m').value);
+  return `${pad(h)}:${pad(mIdx*10)}`;
+}
+function initTPNow(){
+  const now=new Date();
+  const h=now.getHours();
+  const mIdx=Math.min(5,Math.ceil(now.getMinutes()/10)%6);
+  setTimePicker(h,mIdx);
+}
+
+/* ── STATS ── */
+function renderStats(){
+  const bW=MACHINES.filter(m=>m.type==='washer'&&state[m.id]).length;
+  const bD=MACHINES.filter(m=>m.type==='dryer'&&state[m.id]).length;
+  const fW=3-bW,fD=2-bD;
+  document.getElementById('stats-row').innerHTML=`
+    <div class="scard">
+      <div class="snum" style="color:${fW>0?'var(--green)':'var(--red)'}">${fW}</div>
+      <div class="slbl">세탁기 여유</div>
+    </div>
+    <div class="scard">
+      <div class="snum" style="color:${fD>0?'var(--green)':'var(--red)'}">${fD}</div>
+      <div class="slbl">건조기 여유</div>
+    </div>
+    <div class="scard">
+      <div class="snum" style="color:var(--amber)">${bW+bD}</div>
+      <div class="slbl">사용중</div>
+    </div>`;
+}
+
+/* ── NOTIFY BAR ── */
+function renderNBar(){
+  const wrap=document.getElementById('nbar-wrap');
+  if(!('Notification' in window)||notifyGranted){wrap.innerHTML='';return;}
+  wrap.innerHTML=`
+    <div class="nbar" onclick="requestNotify()">
+      <span style="font-size:18px">🔔</span>
+      <p>완료 시 자동 알림을 받으려면 허용해주세요</p>
+      <button>허용</button>
+    </div>`;
+}
+
+/* ── CARD ── */
+function buildCard(m){
+  const s=state[m.id];
+  const busy=!!s;
+  const isW=m.type==='washer';
+  const dC=busy?(isW?'w-drum':'d-drum'):'f-drum';
+  const lC=isW?'':'dlock';
+  const pC=busy?(isW?'spill-busy':'spill-dbusy'):'spill-free';
+  const pT=busy?'사용중':'사용 가능';
+  const fC=isW?'':'bf';
+  const vC=isW?'ac':'bc';
+
+  const drumEl=`<div class="drum ${dC} ${busy?'spinning':''}"><div class="ripple"></div></div>`;
+  const lockEl=`<div class="lock-badge ${lC}">🔒</div>`;
+
+  const q=queues[m.id]||[];
+  let qBlock='';
+  if(busy){
+    const qi=q.length===0
+      ?'<div class="qempty">대기자 없음</div>'
+      :'<div class="qlist">'+q.map((qi,i)=>`
+        <div class="qitem">
+          <div class="qleft">
+            <span class="qn">${i+1}</span>
+            <span class="qr">${qi.room}호</span>
+            ${qi.name?`<span class="qname">${qi.name}</span>`:''}
+          </div>
+          <button class="qrm" onclick="removeQueue('${m.id}',${i})">✕</button>
+        </div>`).join('')+'</div>';
+    qBlock=`<div class="qsec"><div class="qhd">대기 현황 (${q.length}명)</div>${qi}</div>`;
+  }
+
+  let pBar='',tStrip='';
+  if(busy){
+    const rem=remainingMs(s.endTime);
+    const prog=progressPct(s.startTs,s.endTime);
+    tStrip=`
+      <div class="tstrip">
+        <div class="fblock">
+          <div class="flbl">완료 예정</div>
+          <div class="fval ${vC}">${s.endTime}</div>
+        </div>
+        <div class="rblock">
+          <div class="rlbl">남은 시간</div>
+          <div class="rval">${fmtRem(rem)}</div>
+        </div>
+      </div>`;
+    pBar=`<div class="ptrack"><div class="pfill ${fC}" style="width:${prog}%"></div></div>`;
+  }
+
+  let acts='';
+  if(busy){
+    acts=`<div class="cactions">
+      <div style="margin-bottom:8px;"><button class="btn btn-queue" onclick="openQM('${m.id}')">+ 대기 신청</button></div>
+      <button class="btn btn-finish" onclick="finishMachine('${m.id}',false)">✓ 사용 완료 처리</button>
+    </div>`;
+  } else {
+    acts=`<div class="cactions">
+      <button class="btn btn-primary ${isW?'':'db'}" onclick="openSM('${m.id}')" style="width:100%">사용 시작</button>
+    </div>`;
+  }
+
+  return `
+    <div class="mcard state-${busy?'busy':'free'} type-${m.type}" id="card-${m.id}">
+      <div class="ctop">
+        <div class="mvis">
+          <div class="mbody">${drumEl}</div>
+          ${lockEl}
+        </div>
+        <div class="cinfo">
+          <div class="cnrow">
+            <div class="cname">${m.label}</div>
+            <span class="spill ${pC}">${pT}</span>
+          </div>
+          ${busy?`
+            <div class="urow">
+              <div class="rchip">${s.room}호</div>
+              ${s.name?`<div class="uname">${s.name}</div>`:''}
+            </div>
+            ${tStrip}
+          `:`<div class="avail-msg">사용 가능 ✓</div>`}
+        </div>
+      </div>
+      ${pBar}
+      ${qBlock}
+      ${acts}
+    </div>`;
+}
+
+function renderGrid(){
+  document.getElementById('dryer-grid').innerHTML=MACHINES.filter(m=>m.type==='dryer').map(buildCard).join('');
+  document.getElementById('washer-grid').innerHTML=MACHINES.filter(m=>m.type==='washer').map(buildCard).join('');
+}
+function renderHistory(){
+  const el=document.getElementById('history-grid');
+  if(!history.length){el.innerHTML='<div class="hempty">기록 없음</div>';return;}
+  el.innerHTML=history.slice(0,10).map(h=>`
+    <div class="hitem">
+      <div class="hleft">
+        <div class="hico">${h.emoji}</div>
+        <div>
+          <div class="hname">${h.label}${h.name?' · '+h.name:''}</div>
+          <div class="hroom">${h.room}호 · ${h.endTime} 완료</div>
+        </div>
+      </div>
+      <div class="htime">${h.finishedAt}</div>
+    </div>`).join('');
+}
+function render(){renderStats();renderNBar();renderGrid();renderHistory();}
+
+/* ── MODALS ── */
+function buildRoomOpts(){return '<option value="">선택</option>'+ROOMS.map(r=>`<option value="${r}">${r}호</option>`).join('');}
+
+function openSM(id){
+  pendingId=id;
+  const m=MACHINES.find(x=>x.id===id);
+  document.getElementById('sm-title').textContent=`${m.label} 시작`;
+  document.getElementById('sm-room').innerHTML=buildRoomOpts();
+  document.getElementById('sm-name').value='';
+  const isW=m.type==='washer';
+  const slClass='tp-slider '+(isW?'amber-sl':'blue-sl');
+  document.getElementById('sl-h').className=slClass;
+  document.getElementById('sl-m').className=slClass;
+  document.getElementById('sm-confirm').className='btn btn-primary'+(isW?'':' db');
+  initTPNow();
+  buildPresets(isW);
+  document.getElementById('start-modal').classList.add('open');
+}
+function closeSM(e){if(e.target===document.getElementById('start-modal')) closeSMdirect();}
+function closeSMdirect(){document.getElementById('start-modal').classList.remove('open');pendingId=null;}
+
+function confirmStart(){
+  const room=document.getElementById('sm-room').value;
+  const name=document.getElementById('sm-name').value.trim();
+  const endTime=getSelectedTime();
+  if(!room){showToast('호실을 선택해주세요');return;}
+  if(remainingMs(endTime)<60000){showToast('종료 시간이 지금으로부터 1분 이후여야 해요');return;}
+  state[pendingId]={room,name,endTime,startTs:Date.now()};
+  closeSMdirect();
+  saveState();
+  scheduleNotify(pendingId);
+  render();
+  showToast('사용이 시작되었습니다 ⏱');
+}
+
+function finishMachine(id,auto=false){
+  const s=state[id];if(!s) return;
+  const m=MACHINES.find(x=>x.id===id);
+  history.unshift({label:m.label,emoji:m.emoji,room:s.room,name:s.name,endTime:s.endTime,finishedAt:fmtNow()});
+  if(history.length>15) history=history.slice(0,15);
+  clearNotifyTimer(id);
+  state[id]=null;
+  const q=queues[id]||[];
+  if(q.length>0){
+    const next=q[0];
+    showToast(`다음 차례: ${next.room}호${next.name?' '+next.name:''}님`);
+    if(notifyGranted){
+      try{new Notification(`${m.label} 완료 — 다음 차례!`,{body:`${next.room}호${next.name?' '+next.name:''}님, 이제 사용하세요 🧺`,tag:'q-'+id});}catch(e){}
+    }
+  } else if(!auto){
+    showToast(`${m.label} 완료 처리되었습니다`);
+  }
+  saveState();render();
+}
+
+function openQM(id){
+  pendingId=id;
+  const m=MACHINES.find(x=>x.id===id);
+  document.getElementById('qm-title').textContent=`${m.label} 대기 신청`;
+  document.getElementById('qm-room').innerHTML=buildRoomOpts();
+  document.getElementById('qm-name').value='';
+  document.getElementById('queue-modal').classList.add('open');
+}
+function closeQM(e){if(e.target===document.getElementById('queue-modal')) closeQMdirect();}
+function closeQMdirect(){document.getElementById('queue-modal').classList.remove('open');pendingId=null;}
+function confirmQueue(){
+  const room=document.getElementById('qm-room').value;
+  const name=document.getElementById('qm-name').value.trim();
+  if(!room){showToast('호실을 선택해주세요');return;}
+  if((queues[pendingId]||[]).some(q=>q.room===room)){showToast('이미 대기 신청된 호실입니다');return;}
+  queues[pendingId].push({room,name,ts:Date.now()});
+  closeQMdirect();saveState();render();
+  showToast('대기 신청 완료 🙋');
+}
+function removeQueue(id,idx){queues[id].splice(idx,1);saveState();render();}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(t._to);t._to=setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+/* ── TICK (fallback poll) ── */
+function tick(){
+  let changed=false;
+  MACHINES.forEach(m=>{
+    if(state[m.id]&&remainingMs(state[m.id].endTime)<=0){
+      finishMachine(m.id,true);changed=true;
+    }
+  });
+  if(!changed) render();
+}
+
+loadState();render();scheduleAllNotify();
+setInterval(render,10000);
+setInterval(tick,15000);
+</script>
+</body>
+</html>
